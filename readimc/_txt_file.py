@@ -121,10 +121,12 @@ class TXTFile(IMCFile, AcquisitionBase):
             )
         width, height = df[["X", "Y"]].add(1).max(axis=0).astype(int)
         if width * height != len(df.index):
-            raise IOError(
-                f"TXT file '{self.path.name}' corrupted: "
-                "inconsistent acquisition image data size"
-            )
+            height=height-1
+            df=df.iloc[:(width * height)].copy()
+            #raise IOError(
+            #    f"TXT file '{self.path.name}' corrupted: "
+            #    "inconsistent acquisition image data size"
+            #)
         img = np.zeros((height, width, self.num_channels), dtype=np.float32)
         img[df["Y"].astype(int), df["X"].astype(int), :] = df.values[:, 6:]
         return np.moveaxis(img, -1, 0)
